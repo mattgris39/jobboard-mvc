@@ -1,0 +1,175 @@
+<div class="page-header">
+  <div class="dashboard-header-bar">
+    <div>
+      <h1 class="title is-1">Dashboard recruteur</h1>
+      <p class="subtitle is-5">Suivi des candidatures reçues</p>
+    </div>
+
+    <a class="button is-primary" href="/recruiter/jobs/new">
+      + Créer une offre
+    </a>
+  </div>
+</div>
+
+<div class="stats-grid dashboard-stats">
+  <div class="stat-card">
+    <div class="stat-label">Total</div>
+    <div class="stat-value"><%= stats.total %></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Nouvelles</div>
+    <div class="stat-value"><%= stats.new %></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Consultées</div>
+    <div class="stat-value"><%= stats.reviewed %></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Acceptées</div>
+    <div class="stat-value"><%= stats.accepted %></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Refusées</div>
+    <div class="stat-value"><%= stats.rejected %></div>
+  </div>
+</div>
+
+<div class="box form-panel mt-5">
+  <form method="get" action="/recruiter/dashboard">
+    <div class="columns is-multiline dashboard-filter-grid">
+      <div class="column is-4">
+        <div class="field">
+          <label class="label">Filtrer par statut</label>
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select name="status">
+                <option value="all" <%= currentStatus === "all" ? "selected" : "" %>>Toutes</option>
+                <option value="new" <%= currentStatus === "new" ? "selected" : "" %>>new</option>
+                <option value="reviewed" <%= currentStatus === "reviewed" ? "selected" : "" %>>reviewed</option>
+                <option value="accepted" <%= currentStatus === "accepted" ? "selected" : "" %>>accepted</option>
+                <option value="rejected" <%= currentStatus === "rejected" ? "selected" : "" %>>rejected</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-3">
+        <div class="field dashboard-filter-field">
+          <label class="label dashboard-hidden-label">Action</label>
+          <div class="control">
+            <button class="button is-primary is-fullwidth dashboard-filter-button" type="submit">
+              Filtrer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-3">
+        <div class="field dashboard-filter-field">
+          <label class="label dashboard-hidden-label">Reset</label>
+          <div class="control">
+            <a class="button is-light is-fullwidth dashboard-filter-button" href="/recruiter/dashboard">
+              Réinitialiser
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<% if (!applications.length) { %>
+  <div class="empty-state mt-5">
+    Aucune candidature pour ce filtre.
+  </div>
+<% } else { %>
+  <div class="table-container custom-surface mt-5">
+    <table class="table is-fullwidth is-hoverable dashboard-table">
+      <thead>
+        <tr>
+          <th>Poste</th>
+          <th>Entreprise</th>
+          <th>Candidat</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Message</th>
+          <th>CV</th>
+          <th>Statut</th>
+          <th>Action</th>
+          <th>Détail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% applications.forEach(application => { %>
+          <tr>
+            <td><strong><%= application.job_title %></strong></td>
+            <td><%= application.company_name %></td>
+            <td><%= application.candidate_name %></td>
+
+            <td class="mail-cell">
+              <a href="mailto:<%= application.email %>"><%= application.email %></a>
+            </td>
+
+            <td><%= application.phone || "-" %></td>
+
+            <td class="message-cell">
+              <%= application.message || "-" %>
+            </td>
+
+            <td class="cv-cell">
+              <% if (application.cv_path) { %>
+                <a href="<%= application.cv_path %>" target="_blank" rel="noreferrer">Voir le CV</a>
+              <% } else { %>
+                -
+              <% } %>
+            </td>
+
+            <td>
+              <% if (application.status === "new") { %>
+                <span class="tag is-info">new</span>
+              <% } else if (application.status === "reviewed") { %>
+                <span class="tag is-warning">reviewed</span>
+              <% } else if (application.status === "accepted") { %>
+                <span class="tag is-success">accepted</span>
+              <% } else { %>
+                <span class="tag is-danger">rejected</span>
+              <% } %>
+            </td>
+
+            <td>
+              <form method="post" action="/recruiter/applications/<%= application.id %>/status" class="dashboard-status-form">
+                <div class="field has-addons">
+                  <div class="control">
+                    <div class="select is-small">
+                      <select name="status">
+                        <option value="new" <%= application.status === "new" ? "selected" : "" %>>new</option>
+                        <option value="reviewed" <%= application.status === "reviewed" ? "selected" : "" %>>reviewed</option>
+                        <option value="accepted" <%= application.status === "accepted" ? "selected" : "" %>>accepted</option>
+                        <option value="rejected" <%= application.status === "rejected" ? "selected" : "" %>>rejected</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="control">
+                    <button class="button is-primary is-small" type="submit">OK</button>
+                  </div>
+                </div>
+              </form>
+            </td>
+
+            <td>
+              <a class="button is-light is-small" href="/recruiter/applications/<%= application.id %>">
+                Voir
+              </a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>

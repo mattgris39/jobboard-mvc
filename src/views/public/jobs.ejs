@@ -1,0 +1,70 @@
+<div class="page-header">
+  <h1 class="title is-1">Offres</h1>
+  <p class="subtitle is-5">Explore les opportunités disponibles et filtre rapidement.</p>
+</div>
+
+<div class="box form-panel">
+  <form method="get" action="/jobs">
+    <div class="columns is-multiline">
+      <div class="column is-5">
+        <div class="field">
+          <label class="label">Mot-clé</label>
+          <div class="control">
+            <input
+              class="input"
+              name="q"
+              value="<%= q %>"
+              placeholder="Ex. React, Node, Pentest"
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-5">
+        <div class="field">
+          <label class="label">Ville</label>
+          <div class="control">
+            <input
+              class="input"
+              name="location"
+              value="<%= location %>"
+              placeholder="Ex. Nice, Paris, Remote"
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-2 is-flex is-align-items-end">
+        <button class="button is-primary is-fullwidth" type="submit">Filtrer</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<% if (!jobs.length) { %>
+  <div class="empty-state mt-5">
+    Aucune offre trouvée.
+  </div>
+<% } else { %>
+  <div class="job-list">
+    <% jobs.forEach(job => { %>
+      <a class="job-card" href="/jobs/<%= job.id %>">
+        <div class="job-card-top">
+          <div>
+            <div class="job-card-title"><%= job.title %></div>
+            <div class="job-card-meta">
+              <strong><%= job.company_name %></strong> — <%= job.location %>
+            </div>
+          </div>
+
+          <div class="job-card-tags">
+            <% if (job.remote) { %>
+              <span class="tag is-info is-light">Remote</span>
+            <% } %>
+            <span class="tag is-light"><%= job.contract_type %></span>
+          </div>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+<% } %>

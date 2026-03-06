@@ -1,0 +1,95 @@
+<div class="columns is-variable is-6">
+  <div class="column is-7">
+    <div class="page-header">
+      <h1 class="title is-2"><%= job.title %></h1>
+      <p class="subtitle is-5">
+        <strong><%= job.company_name %></strong> — <%= job.location %>
+        <% if (job.company_website) { %>
+          — <a href="<%= job.company_website %>" target="_blank" rel="noreferrer">Site entreprise</a>
+        <% } %>
+      </p>
+    </div>
+
+    <div class="detail-meta">
+      <% if (job.remote) { %>
+        <span class="tag is-info is-light">Remote</span>
+      <% } %>
+
+      <span class="tag is-light"><%= job.contract_type %></span>
+
+      <% if (job.salary_min && job.salary_max) { %>
+        <span class="salary-pill"><%= job.salary_min %> - <%= job.salary_max %> €</span>
+      <% } else if (job.salary_min) { %>
+        <span class="salary-pill">À partir de <%= job.salary_min %> €</span>
+      <% } else if (job.salary_max) { %>
+        <span class="salary-pill">Jusqu'à <%= job.salary_max %> €</span>
+      <% } %>
+    </div>
+
+    <div class="box form-panel">
+      <h2 class="title is-4">Description du poste</h2>
+      <p class="detail-description"><%= job.description %></p>
+    </div>
+
+    <div class="mt-5">
+      <a class="button is-light" href="/jobs">← Retour aux offres</a>
+    </div>
+  </div>
+
+  <div class="column is-5">
+    <div class="box form-panel">
+      <h2 class="title is-4">Postuler</h2>
+      <p class="subtitle is-6">Envoie ta candidature pour cette offre.</p>
+
+      <% if (flash) { %>
+        <article class="message is-<%= flash.type === 'success' ? 'success' : 'danger' %>">
+          <div class="message-body"><%= flash.message %></div>
+        </article>
+      <% } %>
+
+      <form method="post" action="/jobs/<%= job.id %>/apply" enctype="multipart/form-data">
+        <div class="field">
+          <label class="label">Nom</label>
+          <div class="control">
+            <input class="input" name="candidate_name" placeholder="Ton nom" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Email</label>
+          <div class="control">
+            <input class="input" type="email" name="email" placeholder="ton@email.com" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Téléphone</label>
+          <div class="control">
+            <input class="input" name="phone" placeholder="06...">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Message</label>
+          <div class="control">
+            <textarea class="textarea" name="message" rows="5" placeholder="Présente brièvement ton profil et ta motivation"></textarea>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">CV (PDF)</label>
+          <div class="control">
+            <input class="input" type="file" name="cv" accept=".pdf,application/pdf">
+          </div>
+          <p class="help">Format accepté : PDF uniquement.</p>
+        </div>
+
+        <div class="field mt-5">
+          <button class="button is-primary is-fullwidth" type="submit">
+            Envoyer ma candidature
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

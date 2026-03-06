@@ -1,0 +1,81 @@
+<div class="page-header">
+  <h1 class="title is-2">Détail de la candidature</h1>
+  <p class="subtitle is-5">
+    <strong><%= application.candidate_name %></strong> — <%= application.job_title %>
+  </p>
+</div>
+
+<div class="columns is-variable is-5">
+  <div class="column is-7">
+    <div class="box form-panel">
+      <h2 class="title is-4">Profil candidat</h2>
+
+      <div class="content">
+        <p><strong>Nom :</strong> <%= application.candidate_name %></p>
+        <p><strong>Email :</strong> <a href="mailto:<%= application.email %>"><%= application.email %></a></p>
+        <p><strong>Téléphone :</strong> <%= application.phone || "-" %></p>
+        <p>
+          <strong>Statut :</strong>
+          <% if (application.status === "new") { %>
+            <span class="tag is-info">new</span>
+          <% } else if (application.status === "reviewed") { %>
+            <span class="tag is-warning">reviewed</span>
+          <% } else if (application.status === "accepted") { %>
+            <span class="tag is-success">accepted</span>
+          <% } else { %>
+            <span class="tag is-danger">rejected</span>
+          <% } %>
+        </p>
+        <p><strong>Message :</strong></p>
+        <div class="custom-surface p-4" style="border-radius: 14px;">
+          <p class="detail-description"><%= application.message || "Aucun message." %></p>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <% if (application.cv_path) { %>
+          <a class="button is-primary" href="<%= application.cv_path %>" target="_blank" rel="noreferrer">
+            Ouvrir le CV
+          </a>
+        <% } %>
+        <a class="button is-light" href="/recruiter/dashboard">Retour dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="column is-5">
+    <div class="box form-panel">
+      <h2 class="title is-4">Offre concernée</h2>
+
+      <div class="content">
+        <p><strong>Poste :</strong> <%= application.job_title %></p>
+        <p><strong>Entreprise :</strong> <%= application.company_name %></p>
+        <p><strong>Lieu :</strong> <%= application.job_location %></p>
+        <p><strong>Contrat :</strong> <%= application.job_contract_type %></p>
+
+        <p>
+          <strong>Télétravail :</strong>
+          <%= application.job_remote ? "Oui" : "Non" %>
+        </p>
+
+        <% if (application.job_salary_min && application.job_salary_max) { %>
+          <p><strong>Salaire :</strong> <%= application.job_salary_min %> - <%= application.job_salary_max %> €</p>
+        <% } %>
+
+        <% if (application.company_website) { %>
+          <p>
+            <strong>Site :</strong>
+            <a href="<%= application.company_website %>" target="_blank" rel="noreferrer">
+              <%= application.company_website %>
+            </a>
+          </p>
+        <% } %>
+
+        <p><strong>Description :</strong></p>
+        <div class="custom-surface p-4" style="border-radius: 14px;">
+          <p class="detail-description"><%= application.job_description %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
