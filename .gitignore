@@ -1,0 +1,6 @@
+node_modules
+data.sqlite
+sessions.sqlite
+uploads
+.env
+*.swp
