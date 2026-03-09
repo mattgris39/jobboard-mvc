@@ -1,0 +1,43 @@
+<div class="page-header">
+  <h1 class="title is-2">Détail candidature</h1>
+  <p class="subtitle is-6"><strong><%= application.job_title %></strong> · <%= application.company_name %></p>
+</div>
+
+<div class="columns is-variable is-5">
+  <div class="column is-7">
+    <div class="box form-panel">
+      <h2 class="title is-5">Ma candidature</h2>
+      <p><strong>Nom:</strong> <%= application.candidate_name %></p>
+      <p><strong>Email:</strong> <%= application.email %></p>
+      <p><strong>Téléphone:</strong> <%= application.phone || "-" %></p>
+      <p><strong>Message:</strong></p>
+      <div class="custom-surface p-4" style="border-radius:14px;"><%= application.message || "-" %></div>
+      <p class="mt-4">
+        <strong>Statut:</strong>
+        <% if (application.status === "new") { %><span class="tag is-info">Nouveau</span><% } %>
+        <% if (application.status === "reviewed") { %><span class="tag is-warning">En revue</span><% } %>
+        <% if (application.status === "accepted") { %><span class="tag is-success">Accepté</span><% } %>
+        <% if (application.status === "rejected") { %><span class="tag is-danger">Refusé</span><% } %>
+      </p>
+      <% if (application.recruiter_note) { %>
+        <p><strong>Note recruteur:</strong></p>
+        <div class="custom-surface p-4" style="border-radius:14px;"><%= application.recruiter_note %></div>
+      <% } %>
+      <% if (application.cv_path) { %>
+        <a class="button is-primary mt-4" href="<%= application.cv_path %>" target="_blank" rel="noreferrer">Voir mon CV</a>
+      <% } %>
+      <a class="button is-light mt-4" href="/candidate/dashboard">Retour</a>
+    </div>
+  </div>
+
+  <div class="column is-5">
+    <div class="box form-panel">
+      <h2 class="title is-5">Offre</h2>
+      <p><strong>Contrat:</strong> <%= application.job_contract_type %></p>
+      <p><strong>Lieu:</strong> <%= application.job_location %></p>
+      <p><strong>Télétravail:</strong> <%= application.job_remote ? "Oui" : "Non" %></p>
+      <p><strong>Description:</strong></p>
+      <div class="custom-surface p-4" style="border-radius:14px; white-space:pre-line;"><%= application.job_description %></div>
+    </div>
+  </div>
+</div>

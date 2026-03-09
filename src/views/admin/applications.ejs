@@ -1,0 +1,52 @@
+<div class="page-header"><h1 class="title is-2">Admin · Candidatures</h1></div>
+
+<div class="box form-panel">
+  <form method="get" action="/admin/applications" class="columns is-multiline">
+    <div class="column is-7"><input class="input" name="q" value="<%= filters.q %>" placeholder="Recherche candidat/email/offre"></div>
+    <div class="column is-3"><div class="select is-fullwidth"><select name="status"><option value="all" <%= filters.status==='all'?'selected':'' %>>Tous</option><option value="new" <%= filters.status==='new'?'selected':'' %>>Nouveau</option><option value="reviewed" <%= filters.status==='reviewed'?'selected':'' %>>En revue</option><option value="accepted" <%= filters.status==='accepted'?'selected':'' %>>Accepté</option><option value="rejected" <%= filters.status==='rejected'?'selected':'' %>>Refusé</option></select></div></div>
+    <div class="column is-2"><button class="button is-primary" type="submit">Filtrer</button></div>
+  </form>
+</div>
+
+<div class="table-container custom-surface mt-5">
+  <table class="table is-fullwidth is-striped">
+    <thead><tr><th>ID</th><th>Offre</th><th>Candidat</th><th>Email</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody>
+      <% applications.forEach((a) => { %>
+        <tr>
+          <td><%= a.id %></td>
+          <td><%= a.job_title %></td>
+          <td><%= a.candidate_name %></td>
+          <td><%= a.email %></td>
+          <td>
+            <% if (a.status === "new") { %><span class="tag is-info">Nouveau</span><% } %>
+            <% if (a.status === "reviewed") { %><span class="tag is-warning">En revue</span><% } %>
+            <% if (a.status === "accepted") { %><span class="tag is-success">Accepté</span><% } %>
+            <% if (a.status === "rejected") { %><span class="tag is-danger">Refusé</span><% } %>
+          </td>
+          <td class="table-actions">
+            <a class="button is-light is-small" href="/admin/applications/<%= a.id %>/edit">Modifier</a>
+            <form method="post" action="/admin/applications/<%= a.id %>/delete"><button class="button is-danger is-light is-small" type="submit">Supprimer</button></form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<% if (pagination.totalPages > 1) { %>
+  <nav class="pagination is-centered mt-4">
+    <%
+      const applicationsPageLink = (pageValue) => {
+        const params = new URLSearchParams();
+        params.set("q", filters.q || "");
+        params.set("status", filters.status || "all");
+        params.set("page", String(pageValue));
+        return `/admin/applications?${params.toString()}`;
+      };
+    %>
+    <a class="pagination-previous <%= !pagination.hasPrev ? 'is-disabled' : '' %>" <%- pagination.hasPrev ? `href="${applicationsPageLink(pagination.prevPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Précédente</a>
+    <a class="pagination-next <%= !pagination.hasNext ? 'is-disabled' : '' %>" <%- pagination.hasNext ? `href="${applicationsPageLink(pagination.nextPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Suivante</a>
+    <ul class="pagination-list"><li><span class="pagination-link is-current">Page <%= pagination.page %> / <%= pagination.totalPages %></span></li></ul>
+  </nav>
+<% } %>

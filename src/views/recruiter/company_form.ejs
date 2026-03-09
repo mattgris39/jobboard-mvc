@@ -1,0 +1,51 @@
+<div class="page-header">
+  <h1 class="title is-2"><%= company ? "Modifier mon entreprise" : "Créer mon entreprise" %></h1>
+</div>
+
+<div class="columns is-centered">
+  <div class="column is-8" style="max-width:860px;">
+    <div class="box form-panel">
+      <% if (flash) { %>
+        <article class="message is-<%= flash.type === "success" ? "success" : "danger" %>">
+          <div class="message-body"><%= flash.message %></div>
+        </article>
+      <% } %>
+
+      <form method="post" action="/recruiter/company">
+        <div class="columns is-multiline">
+          <div class="column is-8">
+            <label class="label">Nom de l'entreprise</label>
+            <input class="input" name="name" required value="<%= old?.name || '' %>" placeholder="Ex. Acme Tech">
+          </div>
+
+          <div class="column is-4">
+            <label class="label">Statut</label>
+            <div class="select is-fullwidth">
+              <select name="is_active">
+                <option value="1" <%= String(old?.is_active ?? 1) === "1" ? "selected" : "" %>>Active</option>
+                <option value="0" <%= String(old?.is_active ?? 1) === "0" ? "selected" : "" %>>Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="column is-12">
+            <label class="label">Site web</label>
+            <input class="input" name="website" value="<%= old?.website || '' %>" placeholder="https://...">
+          </div>
+
+          <div class="column is-12">
+            <label class="label">Description</label>
+            <textarea class="textarea" name="description" rows="6" placeholder="Présentez votre entreprise"><%= old?.description || '' %></textarea>
+          </div>
+
+          <div class="column is-12">
+            <div class="buttons">
+              <button class="button is-primary" type="submit"><%= company ? "Enregistrer" : "Créer mon entreprise" %></button>
+              <a class="button is-light" href="/recruiter/dashboard">Retour au tableau de bord</a>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

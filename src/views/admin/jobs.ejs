@@ -1,0 +1,62 @@
+<div class="page-header"><h1 class="title is-2">Admin · Offres</h1></div>
+
+<div class="box form-panel">
+  <form method="get" action="/admin/jobs" class="columns is-multiline">
+    <div class="column is-7"><input class="input" name="q" value="<%= filters.q %>" placeholder="Recherche titre/entreprise/lieu"></div>
+    <div class="column is-3"><div class="select is-fullwidth"><select name="status"><option value="all" <%= filters.status==='all'?'selected':'' %>>Tous</option><option value="active" <%= filters.status==='active'?'selected':'' %>>Actives</option><option value="archived" <%= filters.status==='archived'?'selected':'' %>>Archivées</option></select></div></div>
+    <div class="column is-2"><button class="button is-primary" type="submit">Filtrer</button></div>
+  </form>
+</div>
+
+<div class="box form-panel mt-5">
+  <h2 class="title is-5">Créer une offre</h2>
+  <form method="post" action="/admin/jobs" class="columns is-multiline">
+    <div class="column is-4"><input class="input" name="title" placeholder="Titre" required></div>
+    <div class="column is-3"><input class="input" name="location" placeholder="Lieu" required></div>
+    <div class="column is-2"><div class="select is-fullwidth"><select name="contract_type"><option>CDI</option><option>CDD</option><option>Freelance</option><option>Stage</option><option>Alternance</option></select></div></div>
+    <div class="column is-3"><div class="select is-fullwidth"><select name="company_id"><% companies.forEach((c) => { %><option value="<%= c.id %>"><%= c.name %></option><% }) %></select></div></div>
+    <div class="column is-2"><div class="select is-fullwidth"><select name="remote"><option value="0">Sur site</option><option value="1">Télétravail</option></select></div></div>
+    <div class="column is-2"><input class="input" name="salary_min" type="number" placeholder="Salaire min"></div>
+    <div class="column is-2"><input class="input" name="salary_max" type="number" placeholder="Salaire max"></div>
+    <div class="column is-2"><div class="select is-fullwidth"><select name="status"><option value="active">Active</option><option value="archived">Archivée</option></select></div></div>
+    <div class="column is-12"><textarea class="textarea" name="description" required placeholder="Description"></textarea></div>
+    <div class="column is-12"><button class="button is-primary" type="submit">Créer</button></div>
+  </form>
+</div>
+
+<div class="table-container custom-surface mt-5">
+  <table class="table is-fullwidth is-striped">
+    <thead><tr><th>ID</th><th>Titre</th><th>Entreprise</th><th>Lieu</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody>
+      <% jobs.forEach((job) => { %>
+        <tr>
+          <td><%= job.id %></td><td><%= job.title %></td><td><%= job.company_name %></td><td><%= job.location %></td><td><span class="tag status-<%= job.status %>"><%= job.status === "active" ? "Active" : "Archivée" %></span></td>
+          <td class="table-actions">
+            <a class="button is-light is-small" href="/admin/jobs/<%= job.id %>/edit">Modifier</a>
+            <form method="post" action="/admin/jobs/<%= job.id %>/toggle-status">
+              <button class="button is-warning is-light is-small" type="submit"><%= job.status === "active" ? "Archiver" : "Réactiver" %></button>
+            </form>
+            <form method="post" action="/admin/jobs/<%= job.id %>/delete"><button class="button is-danger is-light is-small" type="submit">Supprimer</button></form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<% if (pagination.totalPages > 1) { %>
+  <nav class="pagination is-centered mt-4">
+    <%
+      const jobsPageLink = (pageValue) => {
+        const params = new URLSearchParams();
+        params.set("q", filters.q || "");
+        params.set("status", filters.status || "all");
+        params.set("page", String(pageValue));
+        return `/admin/jobs?${params.toString()}`;
+      };
+    %>
+    <a class="pagination-previous <%= !pagination.hasPrev ? 'is-disabled' : '' %>" <%- pagination.hasPrev ? `href="${jobsPageLink(pagination.prevPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Précédente</a>
+    <a class="pagination-next <%= !pagination.hasNext ? 'is-disabled' : '' %>" <%- pagination.hasNext ? `href="${jobsPageLink(pagination.nextPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Suivante</a>
+    <ul class="pagination-list"><li><span class="pagination-link is-current">Page <%= pagination.page %> / <%= pagination.totalPages %></span></li></ul>
+  </nav>
+<% } %>

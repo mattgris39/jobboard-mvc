@@ -1,0 +1,89 @@
+<div class="page-header">
+  <h1 class="title is-2">Admin · Utilisateurs</h1>
+</div>
+
+<div class="box form-panel">
+  <form method="get" action="/admin/users">
+    <div class="columns is-multiline">
+      <div class="column is-6"><input class="input" name="q" value="<%= filters.q %>" placeholder="Recherche email ou nom"></div>
+      <div class="column is-3">
+        <div class="select is-fullwidth">
+          <select name="role">
+            <option value="all" <%= filters.role === 'all' ? 'selected' : '' %>>Tous rôles</option>
+            <option value="candidate" <%= filters.role === 'candidate' ? 'selected' : '' %>>Candidat</option>
+            <option value="recruiter" <%= filters.role === 'recruiter' ? 'selected' : '' %>>Recruteur</option>
+            <option value="admin" <%= filters.role === 'admin' ? 'selected' : '' %>>Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="column is-3"><button class="button is-primary" type="submit">Filtrer</button></div>
+    </div>
+  </form>
+</div>
+
+<div class="box form-panel mt-5">
+  <h2 class="title is-5">Créer un utilisateur</h2>
+  <form method="post" action="/admin/users">
+    <div class="columns is-multiline">
+      <div class="column is-4"><input class="input" name="full_name" placeholder="Nom complet" required></div>
+      <div class="column is-3"><input class="input" type="email" name="email" placeholder="Email" required></div>
+      <div class="column is-2"><input class="input" name="phone" placeholder="Téléphone"></div>
+      <div class="column is-2">
+        <div class="select is-fullwidth">
+          <select name="role">
+            <option value="candidate">Candidat</option>
+            <option value="recruiter">Recruteur</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="column is-3"><input class="input" type="password" name="password" placeholder="Mot de passe" required></div>
+      <div class="column is-9"><input class="input" name="bio" placeholder="Présentation"></div>
+      <div class="column is-12"><button class="button is-primary" type="submit">Créer</button></div>
+    </div>
+  </form>
+</div>
+
+<div class="table-container custom-surface mt-5">
+  <table class="table is-fullwidth is-striped">
+    <thead><tr><th>ID</th><th>Email</th><th>Nom</th><th>Rôle</th><th>Actif</th><th>Actions</th></tr></thead>
+    <tbody>
+      <% users.forEach((u) => { %>
+        <tr>
+          <td><%= u.id %></td>
+          <td><%= u.email %></td>
+          <td><%= u.full_name || '-' %></td>
+          <td>
+            <span class="tag role-<%= u.role %>">
+              <%= u.role === "admin" ? "Admin" : (u.role === "recruiter" ? "Recruteur" : "Candidat") %>
+            </span>
+          </td>
+          <td><%= u.is_active ? 'Oui' : 'Non' %></td>
+          <td class="table-actions">
+            <a class="button is-light is-small" href="/admin/users/<%= u.id %>/edit">Modifier</a>
+            <form method="post" action="/admin/users/<%= u.id %>/delete">
+              <button class="button is-danger is-light is-small" type="submit">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<% if (pagination.totalPages > 1) { %>
+  <nav class="pagination is-centered mt-4">
+    <%
+      const userPageLink = (pageValue) => {
+        const params = new URLSearchParams();
+        params.set("q", filters.q || "");
+        params.set("role", filters.role || "all");
+        params.set("page", String(pageValue));
+        return `/admin/users?${params.toString()}`;
+      };
+    %>
+    <a class="pagination-previous <%= !pagination.hasPrev ? 'is-disabled' : '' %>" <%- pagination.hasPrev ? `href="${userPageLink(pagination.prevPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Précédente</a>
+    <a class="pagination-next <%= !pagination.hasNext ? 'is-disabled' : '' %>" <%- pagination.hasNext ? `href="${userPageLink(pagination.nextPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Suivante</a>
+    <ul class="pagination-list"><li><span class="pagination-link is-current">Page <%= pagination.page %> / <%= pagination.totalPages %></span></li></ul>
+  </nav>
+<% } %>

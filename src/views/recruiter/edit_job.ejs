@@ -1,0 +1,88 @@
+<div class="page-header">
+  <h1 class="title is-2">Modifier une offre</h1>
+</div>
+
+<div class="columns is-centered">
+  <div class="column is-8">
+    <div class="box form-panel">
+      <% if (flash) { %>
+        <article class="message is-<%= flash.type === "success" ? "success" : "danger" %>">
+          <div class="message-body"><%= flash.message %></div>
+        </article>
+      <% } %>
+
+      <form method="post" action="/recruiter/jobs/<%= job.id %>/update">
+        <div class="columns is-multiline">
+          <div class="column is-12">
+            <label class="label">Titre du poste</label>
+            <div class="control">
+              <input class="input" type="text" name="title" value="<%= old.title || '' %>" required>
+            </div>
+          </div>
+
+          <div class="column is-6">
+            <label class="label">Localisation</label>
+            <div class="control">
+              <input class="input" type="text" name="location" value="<%= old.location || '' %>" required>
+            </div>
+          </div>
+
+          <div class="column is-6">
+            <label class="label">Type de contrat</label>
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select name="contract_type" required>
+                  <option value="CDI" <%= old.contract_type === "CDI" ? "selected" : "" %>>CDI</option>
+                  <option value="CDD" <%= old.contract_type === "CDD" ? "selected" : "" %>>CDD</option>
+                  <option value="Freelance" <%= old.contract_type === "Freelance" ? "selected" : "" %>>Freelance</option>
+                  <option value="Stage" <%= old.contract_type === "Stage" ? "selected" : "" %>>Stage</option>
+                  <option value="Alternance" <%= old.contract_type === "Alternance" ? "selected" : "" %>>Alternance</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="column is-6">
+            <label class="label">Télétravail</label>
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select name="remote">
+                  <option value="0" <%= Number(old.remote) === 0 ? "selected" : "" %>>Non</option>
+                  <option value="1" <%= Number(old.remote) === 1 ? "selected" : "" %>>Oui</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="column is-3">
+            <label class="label">Salaire min</label>
+            <div class="control">
+              <input class="input" type="number" name="salary_min" value="<%= old.salary_min ?? '' %>">
+            </div>
+          </div>
+
+          <div class="column is-3">
+            <label class="label">Salaire max</label>
+            <div class="control">
+              <input class="input" type="number" name="salary_max" value="<%= old.salary_max ?? '' %>">
+            </div>
+          </div>
+
+          <div class="column is-12">
+            <label class="label">Description</label>
+            <div class="control">
+              <textarea class="textarea" name="description" rows="8" required><%= old.description || '' %></textarea>
+            </div>
+          </div>
+
+          <div class="column is-12">
+            <div class="buttons">
+              <button class="button is-primary" type="submit">Enregistrer les modifications</button>
+              <a class="button is-light" href="/recruiter/dashboard">Retour au tableau de bord</a>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

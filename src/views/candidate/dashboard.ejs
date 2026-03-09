@@ -1,0 +1,50 @@
+<div class="page-header">
+  <h1 class="title is-2">Tableau de bord candidat</h1>
+</div>
+
+<% if (!applications.length) { %>
+  <div class="empty-state">Aucune candidature pour le moment.</div>
+<% } else { %>
+  <div class="table-container custom-surface">
+    <table class="table is-fullwidth is-striped">
+      <thead>
+        <tr>
+          <th>Offre</th>
+          <th>Entreprise</th>
+          <th>Lieu</th>
+          <th>Statut</th>
+          <th>Date</th>
+          <th>Détail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% applications.forEach((application) => { %>
+          <tr>
+            <td><strong><%= application.job_title %></strong></td>
+            <td><%= application.company_name %></td>
+            <td><%= application.job_location %></td>
+            <td>
+              <% if (application.status === "new") { %><span class="tag is-info">Nouveau</span><% } %>
+              <% if (application.status === "reviewed") { %><span class="tag is-warning">En revue</span><% } %>
+              <% if (application.status === "accepted") { %><span class="tag is-success">Accepté</span><% } %>
+              <% if (application.status === "rejected") { %><span class="tag is-danger">Refusé</span><% } %>
+            </td>
+            <td><%= application.created_at %></td>
+            <td><a class="button is-small is-light" href="/candidate/applications/<%= application.id %>">Voir</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<% if (pagination.totalPages > 1) { %>
+  <nav class="pagination is-centered mt-5">
+    <% const candidatePageLink = (pageValue) => `/candidate/dashboard?page=${pageValue}`; %>
+    <a class="pagination-previous <%= !pagination.hasPrev ? 'is-disabled' : '' %>" <%- pagination.hasPrev ? `href="${candidatePageLink(pagination.prevPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Précédente</a>
+    <a class="pagination-next <%= !pagination.hasNext ? 'is-disabled' : '' %>" <%- pagination.hasNext ? `href="${candidatePageLink(pagination.nextPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Suivante</a>
+    <ul class="pagination-list">
+      <li><span class="pagination-link is-current">Page <%= pagination.page %> / <%= pagination.totalPages %></span></li>
+    </ul>
+  </nav>
+<% } %>

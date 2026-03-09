@@ -1,0 +1,44 @@
+<div class="page-header">
+  <h1 class="title is-2">Créer un compte</h1>
+</div>
+
+<div class="box form-panel" style="max-width:620px;">
+  <form method="post" action="/auth/register">
+    <div class="columns is-multiline">
+      <div class="column is-12">
+        <label class="label">Nom complet</label>
+        <input class="input" name="full_name" required value="<%= old?.full_name || '' %>">
+      </div>
+
+      <div class="column is-8">
+        <label class="label">Email</label>
+        <input class="input" type="email" name="email" required value="<%= old?.email || '' %>">
+      </div>
+
+      <div class="column is-4">
+        <label class="label">Rôle</label>
+        <div class="select is-fullwidth">
+          <select name="role">
+            <option value="candidate" <%= old?.role !== 'recruiter' ? 'selected' : '' %>>Candidat</option>
+            <option value="recruiter" <%= old?.role === 'recruiter' ? 'selected' : '' %>>Recruteur</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="column is-6">
+        <label class="label">Téléphone</label>
+        <input class="input" name="phone" value="<%= old?.phone || '' %>">
+      </div>
+
+      <div class="column is-6">
+        <label class="label">Mot de passe</label>
+        <input class="input" type="password" name="password" required>
+      </div>
+
+      <div class="column is-12">
+        <button class="button is-primary" type="submit">Créer mon compte</button>
+        <a class="button is-light" href="/auth/login">Déjà inscrit</a>
+      </div>
+    </div>
+  </form>
+</div>

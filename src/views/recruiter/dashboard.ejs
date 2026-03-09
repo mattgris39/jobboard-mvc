@@ -1,175 +1,250 @@
 <div class="page-header">
-  <div class="dashboard-header-bar">
+  <div class="is-flex is-justify-content-space-between is-align-items-center" style="gap:1rem; flex-wrap:wrap;">
     <div>
-      <h1 class="title is-1">Dashboard recruteur</h1>
-      <p class="subtitle is-5">Suivi des candidatures reçues</p>
+      <h1 class="title is-2">Tableau de bord recruteur</h1>
     </div>
-
-    <a class="button is-primary" href="/recruiter/jobs/new">
-      + Créer une offre
-    </a>
+    <% if (company) { %>
+      <a class="button is-primary" href="/recruiter/jobs/new">+ Créer une offre</a>
+    <% } else { %>
+      <a class="button is-warning" href="/recruiter/company">Créer mon entreprise</a>
+    <% } %>
   </div>
 </div>
 
-<div class="stats-grid dashboard-stats">
-  <div class="stat-card">
-    <div class="stat-label">Total</div>
-    <div class="stat-value"><%= stats.total %></div>
-  </div>
+<div class="box form-panel">
+  <h2 class="title is-4">Mon entreprise</h2>
+  <% if (!company) { %>
+    <div class="empty-state">
+      Aucune entreprise liée à votre compte recruteur. Créez votre entreprise pour publier des offres.
+    </div>
+    <div class="buttons mt-4">
+      <a class="button is-primary" href="/recruiter/company">Créer mon entreprise</a>
+    </div>
+  <% } else { %>
+    <div class="content company-summary">
+      <p><strong>Nom :</strong> <%= company.name %></p>
+      <p>
+        <strong>Statut :</strong>
+        <span class="tag <%= company.is_active ? 'status-active' : 'status-archived' %>">
+          <%= company.is_active ? "Active" : "Inactive" %>
+        </span>
+      </p>
+      <p><strong>Site :</strong> <%= company.website || "-" %></p>
+      <p><strong>Description :</strong> <%= company.description || "-" %></p>
+    </div>
+    <div class="buttons mt-4 is-justify-content-flex-end">
+      <a class="button is-light" href="/recruiter/company">Modifier mon entreprise</a>
+    </div>
+  <% } %>
+</div>
 
-  <div class="stat-card">
-    <div class="stat-label">Nouvelles</div>
-    <div class="stat-value"><%= stats.new %></div>
-  </div>
-
-  <div class="stat-card">
-    <div class="stat-label">Consultées</div>
-    <div class="stat-value"><%= stats.reviewed %></div>
-  </div>
-
-  <div class="stat-card">
-    <div class="stat-label">Acceptées</div>
-    <div class="stat-value"><%= stats.accepted %></div>
-  </div>
-
-  <div class="stat-card">
-    <div class="stat-label">Refusées</div>
-    <div class="stat-value"><%= stats.rejected %></div>
-  </div>
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Total candidatures</div><div class="stat-value"><%= stats.total %></div></div>
+  <div class="stat-card"><div class="stat-label">Nouvelles</div><div class="stat-value"><%= stats.new %></div></div>
+  <div class="stat-card"><div class="stat-label">Acceptées</div><div class="stat-value"><%= stats.accepted %></div></div>
 </div>
 
 <div class="box form-panel mt-5">
+  <h2 class="title is-4">Mes candidatures</h2>
   <form method="get" action="/recruiter/dashboard">
-    <div class="columns is-multiline dashboard-filter-grid">
-      <div class="column is-4">
-        <div class="field">
-          <label class="label">Filtrer par statut</label>
-          <div class="control">
-            <div class="select is-fullwidth">
-              <select name="status">
-                <option value="all" <%= currentStatus === "all" ? "selected" : "" %>>Toutes</option>
-                <option value="new" <%= currentStatus === "new" ? "selected" : "" %>>new</option>
-                <option value="reviewed" <%= currentStatus === "reviewed" ? "selected" : "" %>>reviewed</option>
-                <option value="accepted" <%= currentStatus === "accepted" ? "selected" : "" %>>accepted</option>
-                <option value="rejected" <%= currentStatus === "rejected" ? "selected" : "" %>>rejected</option>
-              </select>
-            </div>
-          </div>
+    <input type="hidden" name="jobs_status" value="<%= filters.jobsStatus %>">
+    <input type="hidden" name="jobs_q" value="<%= filters.jobsQ %>">
+    <input type="hidden" name="jobs_page" value="<%= paginations.jobs.page %>">
+    <div class="columns is-multiline">
+      <div class="column is-3">
+        <label class="label">Statut</label>
+        <div class="select is-fullwidth">
+          <select name="app_status">
+            <option value="all" <%= filters.appStatus === "all" ? "selected" : "" %>>Tous</option>
+            <option value="new" <%= filters.appStatus === "new" ? "selected" : "" %>>Nouveau</option>
+            <option value="reviewed" <%= filters.appStatus === "reviewed" ? "selected" : "" %>>En revue</option>
+            <option value="accepted" <%= filters.appStatus === "accepted" ? "selected" : "" %>>Accepté</option>
+            <option value="rejected" <%= filters.appStatus === "rejected" ? "selected" : "" %>>Refusé</option>
+          </select>
         </div>
       </div>
-
-      <div class="column is-3">
-        <div class="field dashboard-filter-field">
-          <label class="label dashboard-hidden-label">Action</label>
-          <div class="control">
-            <button class="button is-primary is-fullwidth dashboard-filter-button" type="submit">
-              Filtrer
-            </button>
-          </div>
-        </div>
+      <div class="column is-6">
+        <label class="label">Recherche</label>
+        <input class="input" name="app_q" value="<%= filters.appQ %>" placeholder="Nom candidat, email, offre">
       </div>
-
-      <div class="column is-3">
-        <div class="field dashboard-filter-field">
-          <label class="label dashboard-hidden-label">Reset</label>
-          <div class="control">
-            <a class="button is-light is-fullwidth dashboard-filter-button" href="/recruiter/dashboard">
-              Réinitialiser
-            </a>
-          </div>
-        </div>
+      <div class="column is-3 is-flex is-align-items-flex-end" style="gap:0.5rem;">
+        <button class="button is-primary" type="submit">Filtrer</button>
+        <a class="button is-light" href="/recruiter/dashboard">Réinitialiser</a>
       </div>
     </div>
   </form>
-</div>
 
-<% if (!applications.length) { %>
-  <div class="empty-state mt-5">
-    Aucune candidature pour ce filtre.
-  </div>
-<% } else { %>
-  <div class="table-container custom-surface mt-5">
-    <table class="table is-fullwidth is-hoverable dashboard-table">
-      <thead>
-        <tr>
-          <th>Poste</th>
-          <th>Entreprise</th>
-          <th>Candidat</th>
-          <th>Email</th>
-          <th>Téléphone</th>
-          <th>Message</th>
-          <th>CV</th>
-          <th>Statut</th>
-          <th>Action</th>
-          <th>Détail</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% applications.forEach(application => { %>
+  <% if (!applications.length) { %>
+    <div class="empty-state">Aucune candidature pour ce filtre.</div>
+  <% } else { %>
+    <div class="table-container custom-surface mt-4">
+      <table class="table is-fullwidth is-striped">
+        <thead>
           <tr>
-            <td><strong><%= application.job_title %></strong></td>
-            <td><%= application.company_name %></td>
-            <td><%= application.candidate_name %></td>
-
-            <td class="mail-cell">
-              <a href="mailto:<%= application.email %>"><%= application.email %></a>
-            </td>
-
-            <td><%= application.phone || "-" %></td>
-
-            <td class="message-cell">
-              <%= application.message || "-" %>
-            </td>
-
-            <td class="cv-cell">
-              <% if (application.cv_path) { %>
-                <a href="<%= application.cv_path %>" target="_blank" rel="noreferrer">Voir le CV</a>
-              <% } else { %>
-                -
-              <% } %>
-            </td>
-
-            <td>
-              <% if (application.status === "new") { %>
-                <span class="tag is-info">new</span>
-              <% } else if (application.status === "reviewed") { %>
-                <span class="tag is-warning">reviewed</span>
-              <% } else if (application.status === "accepted") { %>
-                <span class="tag is-success">accepted</span>
-              <% } else { %>
-                <span class="tag is-danger">rejected</span>
-              <% } %>
-            </td>
-
-            <td>
-              <form method="post" action="/recruiter/applications/<%= application.id %>/status" class="dashboard-status-form">
-                <div class="field has-addons">
-                  <div class="control">
-                    <div class="select is-small">
+            <th>Offre</th>
+            <th>Candidat</th>
+            <th>Email</th>
+            <th>Statut</th>
+            <th>Note interne</th>
+            <th>Action</th>
+            <th>Détail</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% applications.forEach((application) => { %>
+            <tr>
+              <td><strong><%= application.job_title %></strong></td>
+              <td><%= application.candidate_name %></td>
+              <td><a href="mailto:<%= application.email %>"><%= application.email %></a></td>
+              <td>
+                <% if (application.status === "new") { %><span class="tag is-info">Nouveau</span><% } %>
+                <% if (application.status === "reviewed") { %><span class="tag is-warning">En revue</span><% } %>
+                <% if (application.status === "accepted") { %><span class="tag is-success">Accepté</span><% } %>
+                <% if (application.status === "rejected") { %><span class="tag is-danger">Refusé</span><% } %>
+              </td>
+              <td style="max-width:220px;"><%= application.recruiter_note || "-" %></td>
+              <td>
+                <form method="post" action="/recruiter/applications/<%= application.id %>/status">
+                  <div class="field">
+                    <div class="select is-small is-fullwidth">
                       <select name="status">
-                        <option value="new" <%= application.status === "new" ? "selected" : "" %>>new</option>
-                        <option value="reviewed" <%= application.status === "reviewed" ? "selected" : "" %>>reviewed</option>
-                        <option value="accepted" <%= application.status === "accepted" ? "selected" : "" %>>accepted</option>
-                        <option value="rejected" <%= application.status === "rejected" ? "selected" : "" %>>rejected</option>
+                        <option value="new" <%= application.status === "new" ? "selected" : "" %>>Nouveau</option>
+                        <option value="reviewed" <%= application.status === "reviewed" ? "selected" : "" %>>En revue</option>
+                        <option value="accepted" <%= application.status === "accepted" ? "selected" : "" %>>Accepté</option>
+                        <option value="rejected" <%= application.status === "rejected" ? "selected" : "" %>>Refusé</option>
                       </select>
                     </div>
                   </div>
-
-                  <div class="control">
-                    <button class="button is-primary is-small" type="submit">OK</button>
+                  <div class="field mt-2">
+                    <input class="input is-small" name="recruiter_note" value="<%= application.recruiter_note || '' %>" placeholder="Note interne">
                   </div>
-                </div>
-              </form>
-            </td>
+                  <button class="button is-primary is-small" type="submit">OK</button>
+                </form>
+              </td>
+              <td><a class="button is-light is-small" href="/recruiter/applications/<%= application.id %>">Voir</a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
 
-            <td>
-              <a class="button is-light is-small" href="/recruiter/applications/<%= application.id %>">
-                Voir
-              </a>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+  <% if (paginations.applications.totalPages > 1) { %>
+    <nav class="pagination is-centered mt-4">
+      <%
+        const applicationPageLink = (pageValue) => {
+          const params = new URLSearchParams();
+          params.set("app_status", filters.appStatus);
+          params.set("app_q", filters.appQ);
+          params.set("jobs_status", filters.jobsStatus);
+          params.set("jobs_q", filters.jobsQ);
+          params.set("app_page", String(pageValue));
+          params.set("jobs_page", String(paginations.jobs.page));
+          return `/recruiter/dashboard?${params.toString()}`;
+        };
+      %>
+      <a class="pagination-previous <%= !paginations.applications.hasPrev ? 'is-disabled' : '' %>" <%- paginations.applications.hasPrev ? `href="${applicationPageLink(paginations.applications.prevPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Précédente</a>
+      <a class="pagination-next <%= !paginations.applications.hasNext ? 'is-disabled' : '' %>" <%- paginations.applications.hasNext ? `href="${applicationPageLink(paginations.applications.nextPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Suivante</a>
+      <ul class="pagination-list"><li><span class="pagination-link is-current">Page <%= paginations.applications.page %> / <%= paginations.applications.totalPages %></span></li></ul>
+    </nav>
+  <% } %>
+</div>
+
+<div class="box form-panel mt-6">
+  <h2 class="title is-4">Mes offres</h2>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value"><%= jobStats.total %></div></div>
+    <div class="stat-card"><div class="stat-label">Actives</div><div class="stat-value"><%= jobStats.active %></div></div>
+    <div class="stat-card"><div class="stat-label">Archivées</div><div class="stat-value"><%= jobStats.archived %></div></div>
   </div>
-<% } %>
+
+  <form method="get" action="/recruiter/dashboard" class="mt-4">
+    <input type="hidden" name="app_status" value="<%= filters.appStatus %>">
+    <input type="hidden" name="app_q" value="<%= filters.appQ %>">
+    <input type="hidden" name="app_page" value="<%= paginations.applications.page %>">
+    <div class="columns is-multiline">
+      <div class="column is-3">
+        <label class="label">Statut</label>
+        <div class="select is-fullwidth">
+          <select name="jobs_status">
+            <option value="all" <%= filters.jobsStatus === "all" ? "selected" : "" %>>Tous</option>
+            <option value="active" <%= filters.jobsStatus === "active" ? "selected" : "" %>>Active</option>
+            <option value="archived" <%= filters.jobsStatus === "archived" ? "selected" : "" %>>Archivée</option>
+          </select>
+        </div>
+      </div>
+      <div class="column is-6">
+        <label class="label">Recherche</label>
+        <input class="input" name="jobs_q" value="<%= filters.jobsQ %>" placeholder="Titre ou lieu">
+      </div>
+      <div class="column is-3 is-flex is-align-items-flex-end" style="gap:0.5rem;">
+        <button class="button is-primary" type="submit">Filtrer</button>
+        <a class="button is-light" href="/recruiter/dashboard">Réinitialiser</a>
+      </div>
+    </div>
+  </form>
+
+  <% if (!jobs.length) { %>
+    <div class="empty-state">Aucune offre pour ce filtre.</div>
+  <% } else { %>
+    <div class="table-container custom-surface mt-4">
+      <table class="table is-fullwidth is-striped">
+        <thead>
+          <tr>
+            <th>Poste</th>
+            <th>Lieu</th>
+            <th>Contrat</th>
+            <th>Télétravail</th>
+            <th>Statut</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% jobs.forEach((job) => { %>
+            <tr>
+              <td><strong><%= job.title %></strong></td>
+              <td><%= job.location %></td>
+              <td><%= job.contract_type %></td>
+              <td><%= job.remote ? "Oui" : "Non" %></td>
+              <td><span class="tag <%= job.status === "active" ? "status-active" : "status-archived" %>"><%= job.status === "active" ? "Active" : "Archivée" %></span></td>
+              <td><%= (job.created_at || "").slice(0, 10) %></td>
+              <td class="table-actions">
+                <a class="button is-small is-light" href="/recruiter/jobs/<%= job.id %>/edit">Modifier</a>
+                <% if (job.status === "active") { %>
+                  <form method="post" action="/recruiter/jobs/<%= job.id %>/archive">
+                    <button class="button is-small is-danger is-light" type="submit">Archiver</button>
+                  </form>
+                <% } else { %>
+                  <form method="post" action="/recruiter/jobs/<%= job.id %>/reactivate">
+                    <button class="button is-small is-warning is-light" type="submit">Réactiver</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+
+  <% if (paginations.jobs.totalPages > 1) { %>
+    <nav class="pagination is-centered mt-4">
+      <%
+        const jobPageLink = (pageValue) => {
+          const params = new URLSearchParams();
+          params.set("app_status", filters.appStatus);
+          params.set("app_q", filters.appQ);
+          params.set("jobs_status", filters.jobsStatus);
+          params.set("jobs_q", filters.jobsQ);
+          params.set("jobs_page", String(pageValue));
+          params.set("app_page", String(paginations.applications.page));
+          return `/recruiter/dashboard?${params.toString()}`;
+        };
+      %>
+      <a class="pagination-previous <%= !paginations.jobs.hasPrev ? 'is-disabled' : '' %>" <%- paginations.jobs.hasPrev ? `href="${jobPageLink(paginations.jobs.prevPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Précédente</a>
+      <a class="pagination-next <%= !paginations.jobs.hasNext ? 'is-disabled' : '' %>" <%- paginations.jobs.hasNext ? `href="${jobPageLink(paginations.jobs.nextPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Suivante</a>
+      <ul class="pagination-list"><li><span class="pagination-link is-current">Page <%= paginations.jobs.page %> / <%= paginations.jobs.totalPages %></span></li></ul>
+    </nav>
+  <% } %>
+</div>

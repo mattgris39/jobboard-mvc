@@ -35,6 +35,18 @@ export function all(sql, params = []) {
   });
 }
 
+async function hasColumn(tableName, columnName) {
+  const columns = await all(`PRAGMA table_info(${tableName})`);
+  return columns.some((column) => column.name === columnName);
+}
+
+async function ensureColumn(tableName, columnName, sqlTypeAndDefault) {
+  const exists = await hasColumn(tableName, columnName);
+  if (!exists) {
+    await run(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${sqlTypeAndDefault}`);
+  }
+}
+
 export async function initDb() {
   await run(`PRAGMA foreign_keys = ON;`);
 
@@ -44,7 +56,12 @@ export async function initDb() {
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       role TEXT NOT NULL CHECK(role IN ('candidate','recruiter','admin')),
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      full_name TEXT,
+      phone TEXT,
+      bio TEXT,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `);
 
@@ -56,7 +73,9 @@ export async function initDb() {
       website TEXT,
       description TEXT,
       logo_url TEXT,
+      is_active INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     );
   `);
@@ -74,6 +93,7 @@ export async function initDb() {
       description TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','archived')),
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY(company_id) REFERENCES companies(id) ON DELETE CASCADE
     );
   `);
@@ -82,14 +102,44 @@ export async function initDb() {
     CREATE TABLE IF NOT EXISTS applications (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       job_id INTEGER NOT NULL,
+      candidate_user_id INTEGER,
       candidate_name TEXT NOT NULL,
       email TEXT NOT NULL,
       phone TEXT,
       message TEXT,
+      recruiter_note TEXT,
       cv_path TEXT,
-      status TEXT NOT NULL DEFAULT 'new',
+      status TEXT NOT NULL DEFAULT 'new' CHECK(status IN ('new','reviewed','accepted','rejected')),
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY(job_id) REFERENCES jobs(id) ON DELETE CASCADE
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY(job_id) REFERENCES jobs(id) ON DELETE CASCADE,
+      FOREIGN KEY(candidate_user_id) REFERENCES users(id) ON DELETE SET NULL
     );
   `);
+
+  await ensureColumn("users", "full_name", "TEXT");
+  await ensureColumn("users", "phone", "TEXT");
+  await ensureColumn("users", "bio", "TEXT");
+  await ensureColumn("users", "is_active", "INTEGER NOT NULL DEFAULT 1");
+  await ensureColumn("users", "updated_at", "TEXT");
+
+  await ensureColumn("companies", "is_active", "INTEGER NOT NULL DEFAULT 1");
+  await ensureColumn("companies", "updated_at", "TEXT");
+
+  await ensureColumn("jobs", "updated_at", "TEXT");
+
+  await ensureColumn("applications", "candidate_user_id", "INTEGER");
+  await ensureColumn("applications", "recruiter_note", "TEXT");
+  await ensureColumn("applications", "updated_at", "TEXT");
+
+  await run(`UPDATE users SET updated_at = COALESCE(updated_at, created_at, datetime('now'));`);
+  await run(`UPDATE companies SET updated_at = COALESCE(updated_at, created_at, datetime('now'));`);
+  await run(`UPDATE jobs SET updated_at = COALESCE(updated_at, created_at, datetime('now'));`);
+  await run(`UPDATE applications SET updated_at = COALESCE(updated_at, created_at, datetime('now'));`);
+
+  await run(`CREATE INDEX IF NOT EXISTS idx_jobs_status_created_at ON jobs(status, created_at DESC);`);
+  await run(`CREATE INDEX IF NOT EXISTS idx_jobs_company_id ON jobs(company_id);`);
+  await run(`CREATE INDEX IF NOT EXISTS idx_applications_job_id ON applications(job_id);`);
+  await run(`CREATE INDEX IF NOT EXISTS idx_applications_candidate_user_id ON applications(candidate_user_id);`);
+  await run(`CREATE UNIQUE INDEX IF NOT EXISTS idx_applications_job_email_unique ON applications(job_id, email);`);
 }

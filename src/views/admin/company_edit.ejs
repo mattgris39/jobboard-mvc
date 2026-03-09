@@ -1,0 +1,12 @@
+<div class="page-header"><h1 class="title is-2">Modifier entreprise #<%= company.id %></h1></div>
+<div class="box form-panel" style="max-width:900px;">
+  <form method="post" action="/admin/companies/<%= company.id %>/update" class="columns is-multiline">
+    <div class="column is-6"><label class="label">Nom</label><input class="input" name="name" required value="<%= old.name %>"></div>
+    <div class="column is-6"><label class="label">Site</label><input class="input" name="website" value="<%= old.website || '' %>"></div>
+    <div class="column is-6"><label class="label">Recruteur</label><div class="select is-fullwidth"><select name="user_id"><% recruiters.forEach((r) => { %><option value="<%= r.id %>" <%= Number(old.user_id)===r.id?'selected':'' %>><%= r.email %></option><% }) %></select></div></div>
+    <div class="column is-6"><label class="label">Actif</label><div class="select is-fullwidth"><select name="is_active"><option value="1" <%= old.is_active ? 'selected' : '' %>>Oui</option><option value="0" <%= !old.is_active ? 'selected' : '' %>>Non</option></select></div></div>
+    <div class="column is-12"><label class="label">Logo URL</label><input class="input" name="logo_url" value="<%= old.logo_url || '' %>"></div>
+    <div class="column is-12"><label class="label">Description</label><textarea class="textarea" name="description"><%= old.description || '' %></textarea></div>
+    <div class="column is-12"><button class="button is-primary" type="submit">Enregistrer</button> <a class="button is-light" href="/admin/companies">Retour</a></div>
+  </form>
+</div>

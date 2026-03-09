@@ -17,19 +17,25 @@
         <p>
           <strong>Statut :</strong>
           <% if (application.status === "new") { %>
-            <span class="tag is-info">new</span>
+            <span class="tag is-info">Nouveau</span>
           <% } else if (application.status === "reviewed") { %>
-            <span class="tag is-warning">reviewed</span>
+            <span class="tag is-warning">En revue</span>
           <% } else if (application.status === "accepted") { %>
-            <span class="tag is-success">accepted</span>
+            <span class="tag is-success">Accepté</span>
           <% } else { %>
-            <span class="tag is-danger">rejected</span>
+            <span class="tag is-danger">Refusé</span>
           <% } %>
         </p>
         <p><strong>Message :</strong></p>
         <div class="custom-surface p-4" style="border-radius: 14px;">
           <p class="detail-description"><%= application.message || "Aucun message." %></p>
         </div>
+        <% if (application.recruiter_note) { %>
+          <p class="mt-4"><strong>Note interne :</strong></p>
+          <div class="custom-surface p-4" style="border-radius: 14px;">
+            <p class="detail-description"><%= application.recruiter_note %></p>
+          </div>
+        <% } %>
       </div>
 
       <div class="mt-5">
@@ -38,7 +44,7 @@
             Ouvrir le CV
           </a>
         <% } %>
-        <a class="button is-light" href="/recruiter/dashboard">Retour dashboard</a>
+        <a class="button is-light" href="/recruiter/dashboard">Retour au tableau de bord</a>
       </div>
     </div>
   </div>

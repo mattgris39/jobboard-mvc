@@ -2,27 +2,30 @@
   <p class="tag is-info is-light mb-4">Plateforme de recrutement tech</p>
 
   <h1 class="title is-1 mb-3">Trouve ton prochain poste tech</h1>
-  <p class="subtitle is-5">
-    Explore les dernières offres publiées et candidate rapidement en quelques clics.
-  </p>
 
   <div class="hero-actions">
     <a class="button is-primary" href="/jobs">Voir les offres</a>
-    <a class="button is-light" href="/recruiter/dashboard">Espace recruteur</a>
+    <% if (user?.role === "recruiter") { %>
+      <a class="button is-light" href="/recruiter/dashboard">Espace recruteur</a>
+    <% } else if (user?.role === "candidate") { %>
+      <a class="button is-light" href="/candidate/dashboard">Espace candidat</a>
+    <% } else if (user?.role === "admin") { %>
+      <a class="button is-light" href="/admin/dashboard">Espace admin</a>
+    <% } else { %>
+      <a class="button is-light" href="/auth/login">Se connecter</a>
+    <% } %>
   </div>
 </div>
 
-<div class="stats-grid">
+<div class="stats-grid mt-5">
   <div class="stat-card">
     <div class="stat-label">Offres récentes affichées</div>
     <div class="stat-value"><%= latest.length %></div>
   </div>
-
   <div class="stat-card">
     <div class="stat-label">Ciblage</div>
     <div class="stat-value">Tech</div>
   </div>
-
   <div class="stat-card">
     <div class="stat-label">Navigation</div>
     <div class="stat-value">Simple</div>
@@ -31,27 +34,21 @@
 
 <div class="page-header mt-6">
   <h2 class="title is-3">Dernières offres</h2>
-  <p class="subtitle is-6">Les opportunités les plus récentes disponibles sur la plateforme.</p>
 </div>
 
 <% if (!latest.length) { %>
-  <div class="empty-state">
-    Aucune offre disponible.
-  </div>
+  <div class="empty-state">Aucune offre disponible.</div>
 <% } else { %>
   <div class="job-list">
-    <% latest.forEach(job => { %>
+    <% latest.forEach((job) => { %>
       <a class="job-card" href="/jobs/<%= job.id %>">
         <div class="job-card-top">
           <div>
             <div class="job-card-title"><%= job.title %></div>
-            <div class="job-card-meta">
-              <strong><%= job.company_name %></strong> — <%= job.location %>
-            </div>
+            <div class="job-card-meta"><strong><%= job.company_name %></strong> · <%= job.location %></div>
           </div>
-
           <div class="job-card-tags">
-            <span class="tag is-light">Voir l’offre</span>
+            <span class="tag is-light offer-link">Voir l'offre</span>
           </div>
         </div>
       </a>

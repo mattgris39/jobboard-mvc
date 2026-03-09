@@ -1,0 +1,29 @@
+<div class="page-header"><h1 class="title is-2">Modifier candidature #<%= application.id %></h1></div>
+<div class="box form-panel" style="max-width:760px;">
+  <p><strong>Candidat:</strong> <%= application.candidate_name %> (<%= application.email %>)</p>
+  <p><strong>Offre:</strong> <%= application.job_title %></p>
+
+  <form method="post" action="/admin/applications/<%= application.id %>/update" class="mt-5">
+    <div class="field">
+      <label class="label">Statut</label>
+      <div class="select is-fullwidth">
+        <select name="status">
+          <option value="new" <%= old.status==='new'?'selected':'' %>>Nouveau</option>
+          <option value="reviewed" <%= old.status==='reviewed'?'selected':'' %>>En revue</option>
+          <option value="accepted" <%= old.status==='accepted'?'selected':'' %>>Accepté</option>
+          <option value="rejected" <%= old.status==='rejected'?'selected':'' %>>Refusé</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Note interne</label>
+      <textarea class="textarea" name="recruiter_note"><%= old.recruiter_note || '' %></textarea>
+    </div>
+
+    <div class="field mt-5">
+      <button class="button is-primary" type="submit">Enregistrer</button>
+      <a class="button is-light" href="/admin/applications">Retour</a>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,60 @@
+<div class="page-header"><h1 class="title is-2">Admin · Entreprises</h1></div>
+
+<div class="box form-panel">
+  <form method="get" action="/admin/companies" class="columns is-multiline">
+    <div class="column is-7"><input class="input" name="q" value="<%= filters.q %>" placeholder="Recherche nom/site"></div>
+    <div class="column is-3"><div class="select is-fullwidth"><select name="active"><option value="all" <%= filters.active==='all'?'selected':'' %>>Tous</option><option value="1" <%= filters.active==='1'?'selected':'' %>>Actifs</option><option value="0" <%= filters.active==='0'?'selected':'' %>>Inactifs</option></select></div></div>
+    <div class="column is-2"><button class="button is-primary" type="submit">Filtrer</button></div>
+  </form>
+</div>
+
+<div class="box form-panel mt-5">
+  <h2 class="title is-5">Créer une entreprise</h2>
+  <form method="post" action="/admin/companies" class="columns is-multiline">
+    <div class="column is-3"><input class="input" name="name" placeholder="Nom" required></div>
+    <div class="column is-3"><input class="input" name="website" placeholder="Site"></div>
+    <div class="column is-3"><div class="select is-fullwidth"><select name="user_id" required><% recruiters.forEach((r) => { %><option value="<%= r.id %>"><%= r.email %></option><% }) %></select></div></div>
+    <div class="column is-3"><div class="select is-fullwidth"><select name="is_active"><option value="1">Active</option><option value="0">Inactive</option></select></div></div>
+    <div class="column is-12"><textarea class="textarea" name="description" placeholder="Description"></textarea></div>
+    <div class="column is-12"><button class="button is-primary" type="submit">Créer</button></div>
+  </form>
+</div>
+
+<div class="table-container custom-surface mt-5">
+  <table class="table is-fullwidth is-striped">
+    <thead><tr><th>ID</th><th>Nom</th><th>Recruteur</th><th>Site</th><th>Actif</th><th>Actions</th></tr></thead>
+    <tbody>
+      <% companies.forEach((company) => { %>
+        <tr>
+          <td><%= company.id %></td>
+          <td><%= company.name %></td>
+          <td><%= company.recruiter_email || '-' %></td>
+          <td><%= company.website || '-' %></td>
+          <td><%= company.is_active ? 'Oui' : 'Non' %></td>
+          <td class="table-actions">
+            <a class="button is-light is-small" href="/admin/companies/<%= company.id %>/edit">Modifier</a>
+            <form method="post" action="/admin/companies/<%= company.id %>/toggle"><button class="button is-warning is-light is-small" type="submit">Activer/Stop</button></form>
+            <form method="post" action="/admin/companies/<%= company.id %>/delete"><button class="button is-danger is-light is-small" type="submit">Supprimer</button></form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<% if (pagination.totalPages > 1) { %>
+  <nav class="pagination is-centered mt-4">
+    <%
+      const companiesPageLink = (pageValue) => {
+        const params = new URLSearchParams();
+        params.set("q", filters.q || "");
+        params.set("active", filters.active || "all");
+        params.set("page", String(pageValue));
+        return `/admin/companies?${params.toString()}`;
+      };
+    %>
+    <a class="pagination-previous <%= !pagination.hasPrev ? 'is-disabled' : '' %>" <%- pagination.hasPrev ? `href="${companiesPageLink(pagination.prevPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Précédente</a>
+    <a class="pagination-next <%= !pagination.hasNext ? 'is-disabled' : '' %>" <%- pagination.hasNext ? `href="${companiesPageLink(pagination.nextPage)}"` : 'aria-disabled="true" tabindex="-1"' %>>Suivante</a>
+    <ul class="pagination-list"><li><span class="pagination-link is-current">Page <%= pagination.page %> / <%= pagination.totalPages %></span></li></ul>
+  </nav>
+<% } %>

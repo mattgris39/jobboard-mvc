@@ -1,0 +1,62 @@
+<div class="page-header">
+  <h1 class="title is-2">Tableau de bord admin</h1>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Utilisateurs</div><div class="stat-value"><%= globalStats.users %></div></div>
+  <div class="stat-card"><div class="stat-label">Offres</div><div class="stat-value"><%= globalStats.jobs %></div></div>
+  <div class="stat-card"><div class="stat-label">Candidatures</div><div class="stat-value"><%= globalStats.applications %></div></div>
+</div>
+
+<div class="columns mt-6">
+  <div class="column is-half">
+    <div class="box">
+      <h2 class="title is-5">Répartition des rôles</h2>
+      <p>Candidats : <strong><%= userRoleStats.candidate %></strong></p>
+      <p>Recruteurs : <strong><%= userRoleStats.recruiter %></strong></p>
+      <p>Admins : <strong><%= userRoleStats.admin %></strong></p>
+    </div>
+  </div>
+
+  <div class="column is-half">
+    <div class="box">
+      <h2 class="title is-5">Statuts candidatures</h2>
+      <p>Nouvelles : <strong><%= applicationStatusStats.new %></strong></p>
+      <p>En revue : <strong><%= applicationStatusStats.reviewed %></strong></p>
+      <p>Acceptées : <strong><%= applicationStatusStats.accepted %></strong></p>
+      <p>Refusées : <strong><%= applicationStatusStats.rejected %></strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="box mt-5">
+  <h2 class="title is-5">Derniers utilisateurs</h2>
+  <div class="table-container">
+    <table class="table is-fullwidth is-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Actif</th>
+          <th>Créé le</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% recentUsers.forEach((u) => { %>
+          <tr>
+            <td><%= u.id %></td>
+            <td><%= u.email %></td>
+            <td>
+              <span class="tag role-<%= u.role %>">
+                <%= u.role === "admin" ? "Admin" : (u.role === "recruiter" ? "Recruteur" : "Candidat") %>
+              </span>
+            </td>
+            <td><%= u.is_active ? "Oui" : "Non" %></td>
+            <td><%= u.created_at %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
